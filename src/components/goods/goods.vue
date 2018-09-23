@@ -15,7 +15,7 @@
                         <ul>
                             <li @click="selectFood(food,$event)" v-for="(food,index) in item.foods" :key="index" class="food-item">
                                 <div class="icon">
-                                    <img :src="food.icon" alt="">
+                                    <img :src="food.icon" alt="" width="57" height="57">
                                 </div>
                                 <div class="content">
                                     <div class="name">{{food.name}}</div>
@@ -27,6 +27,9 @@
                                         <span class="now">￥{{food.price}}</span>
                                         <span class="old" v-show="food.oldPrice">￥{{food.oldPrice}}</span>
                                     </div>
+                                    <div class="cartcontrol-wrapper">
+                                        <cartcontrol :food="food"></cartcontrol>
+                                    </div>
                                 </div>
                             </li>
                         </ul>
@@ -34,10 +37,13 @@
                 </ul>
             </div>
         </div>
+        <shopcart></shopcart>
     </div>
 </template>
 <script type="text/ecmascript-6">
     import BScroll from 'better-scroll';
+    import shopcart from '../shopcart/shopcart.vue';
+    import cartcontrol from '../cartcontrol/cartcontrol.vue';
     const ERROR = 0;
     export default {
         data() {
@@ -111,6 +117,10 @@
                     this.listHeight.push(height);
                 }
             }
+        },
+        components: {
+          shopcart,
+          cartcontrol
         }
     }
 </script>
@@ -213,4 +223,8 @@
           text-decoration: line-through
           font-size: 10px
           color: rgb(147, 153, 159)
+        .cartcontrol-wrapper
+         position: absolute
+         right: 0
+         bottom: 12px
 </style>
