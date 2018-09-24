@@ -1,8 +1,10 @@
 <template>
     <div class="cartcontrol">
+        <transition name="move">
         <div class="cart-dercase" v-show="food.count > 0" @click="disCount">
             <span class="inner icon-remove_circle_outline"></span>
         </div>
+        </transition>
         <div class="cart-count" v-show="food.count > 0">{{food.count}}</div>
         <div class="cart-discount" @click="addCount">
             <span class="cart-add icon-add_circle"></span>
@@ -43,11 +45,22 @@
      .cart-dercase
       padding: 6px
       display: inline-block
+      transform: translate3d(0,0,0)
+      opacity: 1
       .inner
        line-height: 24px
        font-size: 24px
        color: #00a0dc
        display: inline-block
+       transition: all .4s linear
+       transform: rotate(0)
+      &.move-enter-active,&.move-leave-active
+        transition: all .4s linear
+      &.move-enter,&.move-leave-active
+       opacity: 0
+       transform: translate3d(24px,0,0)
+       .inner
+         transform: rotate(180deg)
      .cart-discount
       padding: 6px
       display: inline-block
