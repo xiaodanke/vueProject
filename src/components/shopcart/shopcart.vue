@@ -4,23 +4,76 @@
         <div class="content">
             <div class="content-left">
                 <div class="logo-wrapper">
-                    <div class="logo">
-                         <i class="icon-shopping_cart"></i>
+                    <div class="logo" :class="{'highLight': totalCount > 0}">
+                         <i class="icon-shopping_cart" :class="{'highLight': totalCount > 0}"></i>
                     </div>
-                    <div class="num">0</div>
+                    <div class="num" v-show="totalCount > 0">{{totalCount}}</div>
                 </div>
-                <div class="price">￥0</div>
-                <div class="des">另需配送费￥4元</div>
-            </div> 
+                <div class="price" :class="{'highLight': totalCount > 0}">￥{{totalPrice}}</div>
+                <div class="des">另需配送费￥{{deliveryPrice}} 元</div>
+            </div>
             <div class="content-right">
-                <div class="pay">￥20元起送</div>
+                <div class="pay" :class="payClass">{{payDesc}}</div>
             </div>
         </div>
     </div>
 </template>
 <script type="text/ecmascript-6">
 export default {
-    
+    props: {
+        selectFoods: {
+            type: Array,
+            default() {
+                return [
+                 {
+                     price: 10,
+                     count: 0
+                 }
+                ]
+            }
+        },
+        deliveryPrice: {
+            type: Number,
+            default: 0
+        },
+        minPrice: {
+            type: Number,
+            default: 0
+        }
+    },
+    computed: {
+        totalPrice() {
+            let total = 0;
+            this.selectFoods.forEach((food) => {
+                total += food.price * food.count;
+            })
+            return total;
+        },
+        totalCount() {
+            let count = 0;
+            this.selectFoods.forEach((food) => {
+                count += food.count;
+            })
+            return count;
+        },
+        payDesc() {
+            if(this.totalPrice === 0 ){
+                return `${this.minPrice}元起送`;
+            }else if(this.totalPrice < this.minPrice){
+                let diff = this.minPrice - this.totalPrice;
+                return `还差${diff}元起送`;
+            }else {
+                return '去结算';
+            }
+        },
+        payClass() {
+            if(this.totalPrice < this.minPrice){
+                return 'not-ethough';
+            }else{
+                return 'ethough';
+            }
+        }
+    }
 }
 </script>
 <style lang="stylus" rel="stylesheet/stylus">
@@ -54,10 +107,14 @@ export default {
           background: #2b343c
           border-radius: 50%
           text-align: center
+          &.highLight
+            background: rgb(0,160,220)
           .icon-shopping_cart
            font-size: 24px
            line-height: 44px
            color: #80858a
+           &.highLight
+            color:#fff
          .num
           position: absolute;
           right: 0
@@ -79,6 +136,8 @@ export default {
          font-size: 16px
          border-right: 1px solid rgba(255,255,255,0.1)
          padding-right: 12px
+         &.highLight
+            color:#fff
         .des
          display: inline-block
          font-size: 10px
@@ -93,9 +152,12 @@ export default {
          line-height: 48px
          font-weight: 700
          font-size: 12px
-         background: #2b333b
          text-align: center
-        
+         &.not-ethough
+          background: #2b333b
+         &.ethough
+          color: #fff
+          background: #00b43c
 </style>
 
 

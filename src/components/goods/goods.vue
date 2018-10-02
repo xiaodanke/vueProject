@@ -37,15 +37,21 @@
                 </ul>
             </div>
         </div>
-        <shopcart></shopcart>
+        <shopcart :deliveryPrice="seller.deliveryPrice"
+                :minPrice="seller.minPrice"></shopcart>
     </div>
-</template>
+</template> 
 <script type="text/ecmascript-6">
     import BScroll from 'better-scroll';
     import shopcart from '../shopcart/shopcart.vue';
     import cartcontrol from '../cartcontrol/cartcontrol.vue';
     const ERROR = 0;
     export default {
+        props:{
+            seller: {
+                type: Object
+            }
+        },
         data() {
             return {
                 goods: [],
@@ -116,6 +122,17 @@
                     height += item.clientHeight;
                     this.listHeight.push(height);
                 }
+            },
+            selectFoods() {
+                let foods = [];
+                this.goods.forEach((good) => {
+                   good.foods.forEach((food) => {
+                       if(food.count){
+                           foods.push(food);
+                       }
+                   })
+                })
+                return foods;
             }
         },
         components: {
