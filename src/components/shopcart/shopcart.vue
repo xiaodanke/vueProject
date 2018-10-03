@@ -1,8 +1,8 @@
 
 <template>
     <div>
-        <div class="shopCart">
-        <div class="content">
+      <div class="shopCart">
+        <div class="content" @click="toggleList">
             <div class="content-left">
                 <div class="logo-wrapper">
                     <div class="logo" :class="{'highLight': totalCount > 0}">
@@ -17,8 +17,7 @@
                 <div class="pay" :class="payClass">{{payDesc}}</div>
             </div>
         </div>
-     </div>
-     <div class="bail-container">
+        <div class="bail-container">
          <div v-for="(bail,index) in bails" :key="index">
              <transition name="drop" @before-enter="beforeDrop" @enter="dropping" @after-enter="afterDrop">
                  <div class="bail" v-show="bail.show">
@@ -27,10 +26,37 @@
              </transition>
          </div>
      </div>
-    </div>
+      <transition name="fold">
+        <div class="shopcart-list" v-show="listShow">
+         <div class="list-header">
+             <h1 class="title">购物车</h1>
+             <span class="empty" @click="clearFood">清空</span>
+         </div>
+         <div class="list-content" ref="listContent">
+             <ul>
+                 <li class="food" v-for="(food,index) in selectFoods" :key="index">
+                     <span class="name">{{food.name}}</span>
+                     <div class="price">
+                         <span>￥{{food.price * food.count}}</span>
+                     </div>
+                     <div class="cartcontrol-wrapper">
+                           <cartcontrol :food="food" @add="addFoods"></cartcontrol>
+                     </div>
+                 </li>
+             </ul>
+         </div>
+     </div>
+     </transition>
+  </div>
+   <transition name="fade">
+         <div class="listMask" @click="hideList" v-show="listShow"></div>
+  </transition>
+  </div>
     
 </template>
 <script type="text/ecmascript-6">
+import cartcontrol from '../cartcontrol/cartcontrol.vue';
+import BScroll from 'better-scroll';
 export default {
     data() {
         return {
@@ -107,9 +133,41 @@ export default {
             }else{
                 return 'ethough';
             }
+        },
+        listShow() {
+            if(!this.totalCount){
+                this.fold = true;
+                return false;
+            }
+            let show = !this.fold;
+            if(show) {
+                this.$nextTick(() => {
+                    if(!this.scroll){
+                        this.scroll = new BScroll(this.$refs.listContent,{
+                            click: true
+                        });
+                    }else{
+                        this.scroll.refresh();
+                    }
+                })
+            }
+            return show;
         }
     },
     methods: {
+        clearFood() {
+            this.selectFoods.forEach((food) => {
+                food.count = 0;
+            })
+        },
+        hideList() {
+            this.fold = true;
+        },
+        toggleList() {
+            if(this.totalCount){
+                this.fold = !this.fold;
+            }
+        },
         drop(el) {
             for(let i=0;i < this.bails.length;i++){
                 let bail = this.bails[i];
@@ -120,6 +178,9 @@ export default {
                     return;
                 }
             }
+        },
+        addFoods(target) {
+            this.drop(target);
         },
         beforeDrop(el) {
             let count = this.bails.length;
@@ -156,16 +217,21 @@ export default {
               el.style.display = 'none';
           }
         }
+    },
+    components: {
+        cartcontrol
     }
 }
 </script>
 <style lang="stylus" rel="stylesheet/stylus">
-    .shopCart
+@import "../../common/stylus/mixin.styl"
+   .shopCart
      position: fixed
      left: 0
      bottom: 0
      width: 100%
      height: 48px
+     z-index: 50
      .content
       display: flex
       background: #141d27
@@ -254,6 +320,78 @@ export default {
         border-radius: 50%
         background: rgb(0,160,220)
         transition: all .4s linear
+    .shopcart-list
+     position:absolute
+     left: 0
+     top: 0
+     width: 100%
+     background: red
+     z-index: -1
+     transform: translate3d(0,-100%,0)
+     &.fold-enter-active,&.fold-leave-active
+      transition: all .5s
+     &.fold-enter,&.fold-leave-active
+      transform: translate3d(0,0,0)
+     .list-header
+      height: 40px
+      line-height: 40px
+      padding: 0 18px
+      background: #f3f5f7
+      border-bottom: 1px solid rgba(7, 17, 27, 0.1)
+      .title
+       float: left
+       font-size: 14px
+      .empty
+        float: right
+        font-size: 12px
+        color: rgb(0, 160, 220)
+     .list-content
+      padding: 0 18px
+      max-height: 217px
+      overflow: hidden
+      background: #fff
+      .food
+       position: relative
+       padding: 12px 0
+       box-sizing: border-box
+       border-1px(rgba(7, 17, 27, 0.1))
+       .name
+        line-height: 24px
+        font-size: 14px
+        color: rgb(7, 17, 27)
+       .price
+        position: absolute
+        right: 90px
+        bottom: 12px
+        font-size: 14px
+        line-height: 24px
+        font-weight: 700
+        color: rgb(240, 20, 20)
+       .cartcontrol-wrapper
+        position: absolute
+        right: 0
+        bottom: 6px
+   .listMask
+      position: fixed
+      left: 0
+      top: 0
+      z-index: 40
+      width: 100%
+      height: 100%
+      backdrop-filter: blur(10px)
+      background: rgba(7, 17, 27, 0.6)
+      &.fade-enter-active,&.fade-leave-active
+       transition: all .5s
+      &.fade-enter,&.fade-leava-active
+       opacity: 0
+       background: rgba(7, 17, 27, 0)
+      
+
+
+
+
+      
+    
 </style>
 
 
