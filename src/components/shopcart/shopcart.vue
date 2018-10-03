@@ -1,6 +1,7 @@
 
 <template>
-    <div class="shopCart">
+    <div>
+        <div class="shopCart">
         <div class="content">
             <div class="content-left">
                 <div class="logo-wrapper">
@@ -16,10 +17,44 @@
                 <div class="pay" :class="payClass">{{payDesc}}</div>
             </div>
         </div>
+     </div>
+     <div class="bail-container">
+         <div v-for="(bail,index) in bails" :key="index">
+             <transition name="drop" @before-enter="beforeDrop" @enter="dropping" @after-enter="afterDrop">
+                 <div class="bail" v-show="bail.show">
+                     <div class="inner inner-hook"></div>
+                 </div>
+             </transition>
+         </div>
+     </div>
     </div>
+    
 </template>
 <script type="text/ecmascript-6">
 export default {
+    data() {
+        return {
+            bails: [
+                {
+                    show: false
+                },
+                {
+                    show: false
+                },
+                {
+                    show: false
+                },
+                {
+                    show: false
+                },
+                {
+                    show: false
+                }
+            ],
+            dropBails: [],
+            fold: true
+        }
+    },
     props: {
         selectFoods: {
             type: Array,
@@ -72,6 +107,54 @@ export default {
             }else{
                 return 'ethough';
             }
+        }
+    },
+    methods: {
+        drop(el) {
+            for(let i=0;i < this.bails.length;i++){
+                let bail = this.bails[i];
+                if(!bail.show){
+                    bail.show = true;
+                    bail.el = el;
+                    this.dropBails.push(bail);
+                    return;
+                }
+            }
+        },
+        beforeDrop(el) {
+            let count = this.bails.length;
+            while(count--){
+                let bail = this.bails[count];
+                if(bail.show){
+                    let rect = bail.el.getBoundingClientRect();
+                    let x = rect.left - 32;
+                    let y = -(window.innerHeight - rect.top - 22);
+                    el.style.display = '';
+                    el.style.webkitTransform=`translate3d(0,${y}px,0)`;
+                    el.style.transform = `translate3d(0,${y}px,0)`;
+                    let inner = el.getElementsByClassName('inner-hook')[0];
+                    inner.style.webkitTransform = `translate3d(${x}px,0,0)`;
+                    inner.style.transform = `translate(${x}px,0,0)`;
+                }
+            }
+
+        },
+        dropping(el) {
+            let rf = el.offsetHeight;
+            this.$nextTick(() => {
+                el.style.webkitTransform = 'translate3d(0,0,0)';
+                el.style.transform = 'translate3d(0,0,0)';
+                let inner = el.getElementsByClassName('inner-hook')[0];
+                inner.style.webkitTransform = 'translate3d(0,0,0)';
+                inner.style.transform = 'translate3d(0,0,0)';
+            })
+        },
+        afterDrop(el) {
+          let bail = this.dropBails.shift();
+          if(bail){
+              bail.show = false;
+              el.style.display = 'none';
+          }
         }
     }
 }
@@ -158,6 +241,19 @@ export default {
          &.ethough
           color: #fff
           background: #00b43c
+    .bail-container
+     .bail
+       position: fixed
+       left: 32px
+       bottom: 22px
+       z-index: 200
+       transition: all 0.4s cubic-bezier(0.49, -0.29, 0.75, 0.41)
+       .inner
+        width: 16px
+        height: 16px
+        border-radius: 50%
+        background: rgb(0,160,220)
+        transition: all .4s linear
 </style>
 
 

@@ -28,7 +28,7 @@
                                         <span class="old" v-show="food.oldPrice">￥{{food.oldPrice}}</span>
                                     </div>
                                     <div class="cartcontrol-wrapper">
-                                        <cartcontrol :food="food"></cartcontrol>
+                                        <cartcontrol :food="food" @add="addFoods"></cartcontrol>
                                     </div>
                                 </div>
                             </li>
@@ -37,7 +37,7 @@
                 </ul>
             </div>
         </div>
-        <shopcart :deliveryPrice="seller.deliveryPrice"
+        <shopcart ref="shopcart" :selectFoods="selectFoods" :deliveryPrice="seller.deliveryPrice"
                 :minPrice="seller.minPrice"></shopcart>
     </div>
 </template> 
@@ -85,6 +85,17 @@
                     }
                 }
                 return 0;
+            },
+             selectFoods() {
+                let foods = [];
+                this.goods.forEach((good) => {
+                   good.foods.forEach((food) => {
+                       if(food.count){
+                           foods.push(food);
+                       }
+                   })
+                })
+                return foods;
             }
         },
         methods: {
@@ -95,6 +106,14 @@
                 let foodList = this.$refs.foodList;
                 let el = foodList[index];
                 this.foodsScroll.scrollToElement(el,300);
+            },
+            addFoods(target) {
+                this._drop(target);
+            },
+            _drop(target) {
+                this.$nextTick(() => {
+                    this.$refs.shopcart.drop(target);
+                })
             },
             selectFood(food,event) {
                 
@@ -122,17 +141,6 @@
                     height += item.clientHeight;
                     this.listHeight.push(height);
                 }
-            },
-            selectFoods() {
-                let foods = [];
-                this.goods.forEach((good) => {
-                   good.foods.forEach((food) => {
-                       if(food.count){
-                           foods.push(food);
-                       }
-                   })
-                })
-                return foods;
             }
         },
         components: {

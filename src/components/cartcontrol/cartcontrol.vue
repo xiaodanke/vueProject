@@ -29,12 +29,15 @@
               }else{
                   this.food.count++;
               }
+              this.$emit('add',event.target);
             },
             disCount(event) {
                 if(!event._constructed){
                     return ;
                 }
-                this.food.count--;
+                if(this.food.count){
+                    this.food.count--;
+                }
             }
         }
     }
