@@ -39,12 +39,14 @@
         </div>
         <shopcart ref="shopcart" :selectFoods="selectFoods" :deliveryPrice="seller.deliveryPrice"
                 :minPrice="seller.minPrice"></shopcart>
+        <food @add="addFoods" :food="selectedFood" ref="food"></food>
     </div>
 </template> 
 <script type="text/ecmascript-6">
     import BScroll from 'better-scroll';
     import shopcart from '../shopcart/shopcart.vue';
     import cartcontrol from '../cartcontrol/cartcontrol.vue';
+    import food from '../food/food.vue';
     const ERROR = 0;
     export default {
         props:{
@@ -56,7 +58,8 @@
             return {
                 goods: [],
                 listHeight: [],
-                scrollY: 0
+                scrollY: 0,
+                selectedFood: {}
             }
         },
         created() {
@@ -116,7 +119,11 @@
                 })
             },
             selectFood(food,event) {
-                
+                if(!event._constructed){
+                    return ;
+                }
+                this.selectedFood = food;
+                this.$refs.food.show();
             },
             _initScroll() {
                 this.menuscroll = new BScroll(this.$refs.menuWrapper,{
@@ -145,7 +152,8 @@
         },
         components: {
           shopcart,
-          cartcontrol
+          cartcontrol,
+          food
         }
     }
 </script>

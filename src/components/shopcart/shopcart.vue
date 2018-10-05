@@ -13,7 +13,7 @@
                 <div class="price" :class="{'highLight': totalCount > 0}">￥{{totalPrice}}</div>
                 <div class="des">另需配送费￥{{deliveryPrice}} 元</div>
             </div>
-            <div class="content-right">
+            <div class="content-right" @click.stop.prevent="payTotal">
                 <div class="pay" :class="payClass">{{payDesc}}</div>
             </div>
         </div>
@@ -216,6 +216,12 @@ export default {
               bail.show = false;
               el.style.display = 'none';
           }
+        },
+        payTotal() {
+            if(this.totalPrice < this.minPrice){
+                return;
+            }
+            alert(`支付${this.totalPrice}元`);
         }
     },
     components: {
