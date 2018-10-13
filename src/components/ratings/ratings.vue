@@ -87,9 +87,15 @@
       methods: {
           selectRating(type) {
               this.selectType = type;
+              this.$nextTick(() => {
+                  this.scroll.refresh();
+              })
           },
           toggleContent() {
               this.onlyContent = !this.onlyContent;
+              this.$nextTick(() => {
+                  this.scroll.refresh();
+              })
           },
           needShow(type,text) {
               if(this.onlyContent && !text){
