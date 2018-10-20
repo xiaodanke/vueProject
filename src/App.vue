@@ -24,7 +24,9 @@
   export default {
     data(){
       return {
-        seller:{}
+        seller:{
+          id: 123
+        }
       }
     },
     created(){
